@@ -1,0 +1,49 @@
+<html>
+<head>
+	<title>upfront mashup</title>
+	<style>
+		body{background-color:#555; font-family:verdana;}
+		div{background-color:#fff; border-radius: 20px; margin:50px auto; padding:20px; width:600px;}
+	</style>
+	<script type="text/javascript"  src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+	<script type="text/javascript">
+	function callTwitter(str){
+		$.ajax({
+		  url: 'http://search.twitter.com/search.json',
+		  dataType: 'jsonp',
+		  data: {q: str},
+		  success: function(twitter) {
+		    $('#comment').html( (twitter.results[0] == undefined) ? 'no comments' : twitter.results[0].text);
+		  }
+		});
+	}	
+
+	function buildSlideShow(flickr){
+		var i=0;
+		(function showPhoto(){
+			var photo = '<div><h3>' + flickr.photos.photo[i].title + '</h3>' +
+				'<img src="http://farm' + flickr.photos.photo[i].farm + '.static.flickr.com/' + flickr.photos.photo[i].server + '/' + flickr.photos.photo[i].id + '_' + flickr.photos.photo[i].secret + '.jpg" />' +
+				'<p id="comment"></p></div>';
+			$('body').html(photo);
+
+			callTwitter(flickr.photos.photo[i].title);
+			i++;
+			if(i < flickr.photos.total){
+				setTimeout(showPhoto, 4000);
+			}
+		}());
+	}	
+
+	(function callFlickr(){
+		$.ajax({
+		  url: 'http://api.flickr.com/services/rest/?method=flickr.people.getPublicPhotos&api_key=b99f8fd835537e5638a50d8261b091c7&user_id=75822290%40N00&format=json&nojsoncallback=1',
+		  dataType: 'json',
+		  success: function(data) {
+		    buildSlideShow(data);
+		  }
+		});	
+	}());	
+	</script>
+</head>
+<body></body>
+</html>
